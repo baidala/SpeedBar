@@ -332,7 +332,7 @@ abstract class Gauge constructor(context: Context, attrs: AttributeSet? = null, 
         textPaint.textSize = dpTOpx(10f)
         textPaint.textAlign = Paint.Align.CENTER
         speedTextPaint.color = 0xFF000000.toInt()
-        speedTextPaint.textSize = dpTOpx(18f)
+        speedTextPaint.textSize = dpTOpx(38f)
         unitTextPaint.color = 0xFF000000.toInt()
         unitTextPaint.textSize = dpTOpx(15f)
         sections.add(Section(0f, .6f, 0xFF00FF00.toInt(), speedometerWidth).inGauge(this))
@@ -1120,14 +1120,16 @@ abstract class Gauge constructor(context: Context, attrs: AttributeSet? = null, 
                                     , internal val paddingH: Int // horizontal padding
                                     , internal val paddingV: Int // vertical padding
     ) {
-        TOP_LEFT     (0f, 0f, 0f, 0f, 1, 1),
-        TOP_CENTER   (.5f, 0f, .5f, 0f, 0, 1),
-        TOP_RIGHT    (1f, 0f, 1f, 0f, -1, 1),
-        LEFT         (0f, .5f, 0f, .5f, 1, 0),
-        CENTER       (.5f, .5f, .5f, .5f, 0, 0),
-        RIGHT        (1f, .5f, 1f, .5f, -1, 0),
-        BOTTOM_LEFT  (0f, 1f, 0f, 1f, 1, -1),
-        BOTTOM_CENTER(.5f, 1f, .5f, 1f, 0, -1),
-        BOTTOM_RIGHT (1f, 1f, 1f, 1f, -1, -1)
+        TOP_LEFT          (0f, 0f, 0f, 0f, 1, 1),
+        TOP_CENTER        (.5f, 0f, .5f, 0f, 0, 1),
+        TOP_RIGHT         (1f, 0f, 1f, 0f, -1, 1),
+        LEFT              (0f, .5f, 0f, .5f, 1, 0),
+        CENTER            (.5f, .5f, .5f, .5f, 0, 0),
+        RIGHT             (1f, .5f, 1f, .5f, -1, 0),
+        BOTTOM_LEFT       (0f, 1f, 0f, 1f, 1, -1),
+        BOTTOM_CENTER     (.5f, 1f, .5f, 1f, 0, -1),
+        BOTTOM_RIGHT      (1f, 1f, 1f, 1f, -1, -1),
+        BOTTOM_HALF_CENTER(.5f, .75f, .5f, 1f, 0, -1),
+        TOP_HALF_CENTER   (.5f, .25f, .5f, 0f, 0, 1)
     }
 }
