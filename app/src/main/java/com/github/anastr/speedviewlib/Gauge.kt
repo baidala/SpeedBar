@@ -34,7 +34,7 @@ abstract class Gauge constructor(context: Context, attrs: AttributeSet? = null, 
     private val unitTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 
     /** unit text, the text after speed text.  */
-    var unit = "Km/h"
+    var unit = ""
         set(unit) {
             field = unit
             if (attachedToWindow)

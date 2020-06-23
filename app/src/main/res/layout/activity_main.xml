@@ -16,6 +16,8 @@
         RaySpeedometer:sv_markColor="@color/gray"
         RaySpeedometer:sv_rimColor="@color/text_color_login_label"
         RaySpeedometer:sv_speedTextPosition="CENTER"
+        RaySpeedometer:sv_withTremble="false"
+        RaySpeedometer:sv_maxSpeed="300"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

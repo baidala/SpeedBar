@@ -19,10 +19,17 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
     private val speedBackgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val rimPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var circleBounds = RectF()
-
     private var withEffects = true
-
     private var degreeBetweenMark = 5
+
+    protected var titleText: String? = null
+    protected var kilogramText: String? = null
+    protected var titlePaint = Paint()
+    protected var kilogramPaint = Paint()
+    protected var titleTextColor = 0x1000000.toInt()
+    protected var kilogramTextColor = 0x1000000.toInt()
+    protected var titleTextSize = 20
+    protected var kilogramTextSize = 20
 
     var isWithEffects: Boolean
         get() = withEffects
