@@ -39,8 +39,8 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
 
 
     var titleText = ""
-        set(unit) {
-            field = unit
+        set(titleText) {
+            field = titleText
             if (isAttachedToWindow)
                 invalidate()
         }
@@ -121,6 +121,8 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
         if (attrs == null)
             return
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.RaySpeedometer, 0, 0)
+        val titleText = a.getString(R.styleable.RaySpeedometer_sv_titleText)
+        this.titleText = titleText ?: this.titleText
         speedLimit = a.getFloat(R.styleable.RaySpeedometer_sv_speedLimit, speedLimit)
         rimPaint.color = a.getColor(R.styleable.RaySpeedometer_sv_rimColor, rimPaint.color)
         val degreeBetweenMark = a.getInt(R.styleable.RaySpeedometer_sv_degreeBetweenMark, this.degreeBetweenMark)

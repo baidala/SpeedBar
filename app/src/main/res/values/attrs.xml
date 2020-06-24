@@ -132,6 +132,7 @@
         <attr name="sv_markWidth" format="dimension"/>
         <attr name="sv_rimColor" format="color"/>
         <attr name="sv_speedLimit" format="float" />
+        <attr name="sv_titleText" format="string" />
     </declare-styleable>
 
     <declare-styleable name="PointerSpeedometer" parent="Speedometer">

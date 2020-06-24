@@ -19,6 +19,7 @@
         RaySpeedometer:sv_withTremble="false"
         RaySpeedometer:sv_maxSpeed="11310"
         RaySpeedometer:sv_speedLimit="11250"
+        RaySpeedometer:sv_titleText="Ingr"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
