@@ -5,6 +5,7 @@ import android.graphics.*
 import android.os.Build
 import android.text.TextPaint
 import android.util.AttributeSet
+import com.github.anastr.speedviewlib.components.Section
 import com.github.anastr.speedviewlib.components.indicators.Indicator
 import ua.baidala.speedbar.R
 
@@ -27,15 +28,22 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
     private var speedLimitKgCanvas: Canvas? = null
     private var speedLimitKgPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
     private var speedLimitKgInterval = dpTOpx(3f)
+    private var titleTextBitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+    private var titleTextCanvas: Canvas? = null
 
-    protected var titleText: String? = null
-    protected var titlePaint = Paint()
+    protected var titleTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
     protected var titleTextSize = 20
+
     protected var kilogramText = "Kg"
     protected var kilogramTextSize = 20
 
 
-
+    var titleText = ""
+        set(unit) {
+            field = unit
+            if (isAttachedToWindow)
+                invalidate()
+        }
 
     var isWithEffects: Boolean
         get() = withEffects
@@ -90,6 +98,8 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
         set(value) = setSpeedLimits(minSpeed, value, maxSpeed)
 
     var speedLimitKgPosition = Position.BOTTOM_HALF_CENTER
+
+    var titleTextPosition = Position.TOP_HALF_CENTER
 
 
 
@@ -150,13 +160,14 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
         updateBounds()
         updateBackgroundBitmap()
         setSpeedLimitKgBitmap()
+        setTitleTextBitmap()
     }
 
     private fun updatePaints() {
-        titlePaint.color = 0xFF000000.toInt()
-        titlePaint.style = Paint.Style.FILL
-        titlePaint.isAntiAlias = true
-        titlePaint.textSize = dpTOpx(titleTextSize.toFloat())
+        titleTextPaint.color = 0xFF000000.toInt()
+        titleTextPaint.style = Paint.Style.FILL
+        titleTextPaint.isAntiAlias = true
+        titleTextPaint.textSize = dpTOpx(titleTextSize.toFloat())
 
         speedLimitKgPaint.color = 0xFF000000.toInt()
         speedLimitKgPaint.style = Paint.Style.FILL
@@ -168,6 +179,12 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
         if (widthPa > 0 && heightPa > 0)
             speedLimitKgBitmap = Bitmap.createBitmap(widthPa, heightPa, Bitmap.Config.ARGB_8888)
         speedLimitKgCanvas = Canvas(speedLimitKgBitmap)
+    }
+
+    private fun setTitleTextBitmap() {
+        if (widthPa > 0 && heightPa > 0)
+            titleTextBitmap = Bitmap.createBitmap(widthPa, heightPa, Bitmap.Config.ARGB_8888)
+        titleTextCanvas = Canvas(titleTextBitmap)
     }
 
     private fun getSpeedLimitText() = speedTextListener.invoke(speedLimit)
@@ -193,10 +210,12 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
                 i += degreeBetweenMark
                 continue
             }
-            if (currentSection != null)
-                activeMarkPaint.color = currentSection!!.color
+            var section = getSectionByDegree(i)
+            if (section != null)
+                activeMarkPaint.color = section!!.color
             else
                 activeMarkPaint.color = 0 // transparent color
+
             canvas.drawPath(markPath, activeMarkPaint)
             canvas.rotate(degreeBetweenMark.toFloat(), size * .5f, size / 2f)
             i += degreeBetweenMark
@@ -214,6 +233,7 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
 
         drawSpeedUnitText(canvas)
         drawSpeedLimitKgText(canvas)
+        drawTitleText(canvas)
     }
 
     override fun updateBackgroundBitmap() {
@@ -226,6 +246,15 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
             drawTicks(c)
         /*else
             drawDefMinMaxSpeedPosition(c)*/
+    }
+
+    private fun getSectionByDegree(degree: Int): Section? {
+        sections.forEach {
+            if ((getEndDegree() - getStartDegree()) * it.startOffset + getStartDegree() <= degree
+                    && (getEndDegree() - getStartDegree()) * it.endOffset + getStartDegree() >= degree)
+                return it
+        }
+        return null
     }
 
     private fun updateMarkPath() {
@@ -247,6 +276,13 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
         updateSpeedLimitKgBitmap(getSpeedLimitText().toString())
         canvas.drawBitmap(speedLimitKgBitmap, r.left - speedLimitKgBitmap.width * .5f + r.width() * .5f
                 , r.top - speedLimitKgBitmap.height * .5f + r.height() * .5f, speedLimitKgPaint)
+    }
+
+    protected fun drawTitleText(canvas: Canvas) {
+        val r = getTitleTextBounds()
+        updateTitleBitmap(titleText)
+        canvas.drawBitmap(titleTextBitmap, r.left - titleTextBitmap.width * .5f + r.width() * .5f
+                , r.top - titleTextBitmap.height * .5f + r.height() * .5f, titleTextPaint)
     }
 
     /**
@@ -282,6 +318,27 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
      */
     private fun getSpeedLimitKgHeight(): Float = speedLimitKgPaint.textSize
 
+
+    private fun getTitleTextBounds(): RectF {
+        val left = widthPa * titleTextPosition.x - translatedDx + padding -
+                getTitleTextWidth() * titleTextPosition.width + titleTextPosition.paddingH
+        val top = heightPa * titleTextPosition.y - translatedDy + padding -
+                getTitleTextHeight() * titleTextPosition.height + titleTextPosition.paddingV
+        return RectF(left, top, left + getTitleTextWidth(), top + getTitleTextHeight())
+    }
+
+    private fun getTitleTextWidth(): Float =
+            titleTextPaint.measureText(titleText)
+
+    private fun getTitleTextHeight(): Float = titleTextPaint.textSize
+
+    private fun updateTitleBitmap(titleText: String) {
+        titleTextBitmap.eraseColor(0)
+
+        val titleTextX: Float = titleTextBitmap.width * .5f - getTitleTextWidth() * .5f
+        val h = titleTextBitmap.height * .5f + getTitleTextHeight() * .5f
+        titleTextCanvas?.drawText(titleText, titleTextX, h, titleTextPaint)
+    }
 
     override fun setIndicator(indicator: Indicator.Indicators) {
         super.setIndicator(indicator)
