@@ -233,9 +233,9 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
         speedBackgroundRect.bottom += 2f
         canvas.drawRect(speedBackgroundRect, speedBackgroundPaint)
 
+        drawTitleText(canvas)
         drawSpeedUnitText(canvas)
         drawSpeedLimitKgText(canvas)
-        drawTitleText(canvas)
     }
 
     override fun updateBackgroundBitmap() {
