@@ -18,24 +18,29 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
     private val markPath = Path()
     private val markPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val activeMarkPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val speedBackgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val textBitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val rimPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var circleBounds = RectF()
-    private var withEffects = true
+    private var withEffects = false
     private var degreeBetweenMark = 5
     private var _speedLimit = 100f
     private var speedLimitKgBitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     private var speedLimitKgCanvas: Canvas? = null
     private var speedLimitKgPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
     private var speedLimitKgInterval = dpTOpx(3f)
+    private var speedLimitKgPosition = Position.BOTTOM_HALF_CENTER
     private var titleTextBitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     private var titleTextCanvas: Canvas? = null
+    private var titleTextPosition = Position.TOP_HALF_CENTER
+    private var titleTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
+    private var kilogramTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
 
-    protected var titleTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
-    protected var titleTextSize = 20
-
-    protected var kilogramText = "Kg"
-    protected var kilogramTextSize = 20
+    var kilogramText = "kg"
+        set(kilogramText) {
+            field = kilogramText
+            if (isAttachedToWindow)
+                invalidate()
+        }
 
 
     var titleText = ""
@@ -43,6 +48,21 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
             field = titleText
             if (isAttachedToWindow)
                 invalidate()
+        }
+
+    /**
+     * change just title text size.
+     *
+     * @see dpTOpx
+     * @see textSize
+     * @see unitTextSize
+     */
+    var titleTextSize: Float
+        get() = titleTextPaint.textSize
+        set(titleTextSize) {
+            titleTextPaint.textSize = titleTextSize
+            if (isAttachedToWindow)
+                invalidateGauge()
         }
 
     var isWithEffects: Boolean
@@ -56,21 +76,21 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
                 rimPaint.maskFilter = null
                 /*rimPaint.maskFilter = BlurMaskFilter(3f, BlurMaskFilter.Blur.SOLID)*/
                 activeMarkPaint.maskFilter = BlurMaskFilter(5f, BlurMaskFilter.Blur.SOLID)
-                speedBackgroundPaint.maskFilter = BlurMaskFilter(8f, BlurMaskFilter.Blur.SOLID)
+//                speedBackgroundPaint.maskFilter = BlurMaskFilter(8f, BlurMaskFilter.Blur.SOLID)
             } else {
                 rimPaint.maskFilter = null
                 activeMarkPaint.maskFilter = null
-                speedBackgroundPaint.maskFilter = null
+//                speedBackgroundPaint.maskFilter = null
             }
             invalidateGauge()
         }
 
-    var speedBackgroundColor: Int
+    /*var speedBackgroundColor: Int
         get() = speedBackgroundPaint.color
         set(speedBackgroundColor) {
             speedBackgroundPaint.color = speedBackgroundColor
             invalidateGauge()
-        }
+        }*/
 
     var markWidth: Float
         get() = markPaint.strokeWidth
@@ -97,9 +117,20 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
         get() = _speedLimit
         set(value) = setSpeedLimits(minSpeed, value, maxSpeed)
 
-    var speedLimitKgPosition = Position.BOTTOM_HALF_CENTER
+    var speedLimitKgTextSize: Float
+        get() = speedLimitKgPaint.textSize
+        set(speedLimitTextSize) {
+            speedLimitKgPaint.textSize = speedLimitTextSize
+            if (isAttachedToWindow)
+                invalidateGauge()
+        }
 
-    var titleTextPosition = Position.TOP_HALF_CENTER
+    var drawSpeedLimit = true
+        set(drawSpeedLimit) {
+            field = drawSpeedLimit
+            if (isAttachedToWindow)
+                invalidateGauge()
+        }
 
 
 
@@ -123,13 +154,21 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
         val a = context.theme.obtainStyledAttributes(attrs, R.styleable.RaySpeedometer, 0, 0)
         val titleText = a.getString(R.styleable.RaySpeedometer_sv_titleText)
         this.titleText = titleText ?: this.titleText
+        titleTextPaint.color = a.getColor(R.styleable.RaySpeedometer_sv_titleTextColor, titleTextPaint.color)
+        titleTextPaint.textSize = a.getDimension(R.styleable.RaySpeedometer_sv_titleTextSize, titleTextPaint.textSize)
+        val kilogramText = a.getString(R.styleable.RaySpeedometer_sv_kilogramText)
+        this.kilogramText = kilogramText ?: this.kilogramText
+        kilogramTextPaint.color = a.getColor(R.styleable.RaySpeedometer_sv_kilogramTextColor, kilogramTextPaint.color)
+        kilogramTextPaint.textSize = a.getDimension(R.styleable.RaySpeedometer_sv_kilogramTextSize, kilogramTextPaint.textSize)
+        drawSpeedLimit = a.getBoolean(R.styleable.RaySpeedometer_sv_drawSpeedLimit, true)
         speedLimit = a.getFloat(R.styleable.RaySpeedometer_sv_speedLimit, speedLimit)
+        speedLimitKgPaint.color = a.getColor(R.styleable.RaySpeedometer_sv_speedLimitColor, speedLimitKgPaint.color)
+        speedLimitKgPaint.textSize = a.getDimension(R.styleable.RaySpeedometer_sv_speedLimitSize, speedLimitKgPaint.textSize)
         rimPaint.color = a.getColor(R.styleable.RaySpeedometer_sv_rimColor, rimPaint.color)
         val degreeBetweenMark = a.getInt(R.styleable.RaySpeedometer_sv_degreeBetweenMark, this.degreeBetweenMark)
         val markWidth = a.getDimension(R.styleable.RaySpeedometer_sv_markWidth, markPaint.strokeWidth)
         markPaint.strokeWidth = markWidth
         activeMarkPaint.strokeWidth = markWidth
-        speedBackgroundPaint.color = a.getColor(R.styleable.RaySpeedometer_sv_speedBackgroundColor, speedBackgroundPaint.color)
         withEffects = a.getBoolean(R.styleable.RaySpeedometer_sv_withEffects, withEffects)
         a.recycle()
         isWithEffects = withEffects
@@ -140,13 +179,25 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
     private fun init() {
         markPaint.style = Paint.Style.STROKE
         markPaint.strokeWidth = dpTOpx(3f)
+
         activeMarkPaint.style = Paint.Style.STROKE
         activeMarkPaint.strokeWidth = dpTOpx(3f)
+
         rimPaint.style = Paint.Style.STROKE
-        rimPaint.strokeWidth = dpTOpx(3f)
-        rimPaint.color = 0xFFFFFFFF.toInt()
-        speedBackgroundPaint.color = 0xFFFFFFFF.toInt()
-        updatePaints()
+        rimPaint.strokeWidth = dpTOpx(5f)
+        rimPaint.color = 0xFF368003.toInt()
+
+        titleTextPaint.color = 0xFF000000.toInt()
+        titleTextPaint.isAntiAlias = true
+        titleTextPaint.textSize = dpTOpx(20f)
+
+        speedLimitKgPaint.color = 0xFF000000.toInt()
+        speedLimitKgPaint.isAntiAlias = true
+        speedLimitKgPaint.textSize = dpTOpx(20f)
+
+        kilogramTextPaint.color = 0xFF000000.toInt()
+        kilogramTextPaint.isAntiAlias = true
+        kilogramTextPaint.textSize = dpTOpx(16f)
 
         if (Build.VERSION.SDK_INT >= 11)
             setLayerType(LAYER_TYPE_SOFTWARE, null)
@@ -158,23 +209,10 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
         super.onSizeChanged(w, h, oldW, oldH)
 
         updateMarkPath()
-        updatePaints()
         updateBounds()
         updateBackgroundBitmap()
         setSpeedLimitKgBitmap()
         setTitleTextBitmap()
-    }
-
-    private fun updatePaints() {
-        titleTextPaint.color = 0xFF000000.toInt()
-        titleTextPaint.style = Paint.Style.FILL
-        titleTextPaint.isAntiAlias = true
-        titleTextPaint.textSize = dpTOpx(titleTextSize.toFloat())
-
-        speedLimitKgPaint.color = 0xFF000000.toInt()
-        speedLimitKgPaint.style = Paint.Style.FILL
-        speedLimitKgPaint.isAntiAlias = true
-        speedLimitKgPaint.textSize = dpTOpx(kilogramTextSize.toFloat())
     }
 
     private fun setSpeedLimitKgBitmap() {
@@ -201,6 +239,7 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+        // Draw marks
         canvas.save()
         canvas.rotate(getStartDegree() + 90f, size * .5f, size * .5f)
         var i = getStartDegree()
@@ -227,15 +266,9 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
         //Draw the rim
         canvas.drawArc(circleBounds, 360f, 360f, false, rimPaint)
 
-        val speedBackgroundRect = getSpeedUnitTextBounds()
-        speedBackgroundRect.left -= 2f
-        speedBackgroundRect.right += 2f
-        speedBackgroundRect.bottom += 2f
-        canvas.drawRect(speedBackgroundRect, speedBackgroundPaint)
-
         drawTitleText(canvas)
         drawSpeedUnitText(canvas)
-        drawSpeedLimitKgText(canvas)
+        if (drawSpeedLimit) { drawSpeedLimitKgText(canvas) }
     }
 
     override fun updateBackgroundBitmap() {
@@ -277,14 +310,14 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
         val r = getSpeedLimitKgTextBounds()
         updateSpeedLimitKgBitmap(getSpeedLimitText().toString())
         canvas.drawBitmap(speedLimitKgBitmap, r.left - speedLimitKgBitmap.width * .5f + r.width() * .5f
-                , r.top - speedLimitKgBitmap.height * .5f + r.height() * .5f, speedLimitKgPaint)
+                , r.top - speedLimitKgBitmap.height * .5f + r.height() * .5f, textBitmapPaint)
     }
 
     protected fun drawTitleText(canvas: Canvas) {
         val r = getTitleTextBounds()
         updateTitleBitmap(titleText)
         canvas.drawBitmap(titleTextBitmap, r.left - titleTextBitmap.width * .5f + r.width() * .5f
-                , r.top - titleTextBitmap.height * .5f + r.height() * .5f, titleTextPaint)
+                , r.top - titleTextBitmap.height * .5f + r.height() * .5f, textBitmapPaint)
     }
 
     /**
@@ -293,32 +326,32 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
      */
     private fun getSpeedLimitKgTextBounds(): RectF {
         val left = widthPa * speedLimitKgPosition.x - translatedDx + padding -
-                getSpeedLimitKgWidth() * speedLimitKgPosition.width + speedLimitKgPosition.paddingH
+                getSpeedLimitKgWidth() * speedLimitKgPosition.width + padding * speedLimitKgPosition.paddingH
         val top = heightPa * speedLimitKgPosition.y - translatedDy + padding -
-                getSpeedLimitKgHeight() * speedLimitKgPosition.height + speedLimitKgPosition.paddingV
+                getSpeedLimitKgHeight() * speedLimitKgPosition.height + padding * speedLimitKgPosition.paddingV
         return RectF(left, top, left + getSpeedLimitKgWidth(), top + getSpeedLimitKgHeight())
     }
 
     private fun updateSpeedLimitKgBitmap(speedLimitText: String) {
         speedLimitKgBitmap.eraseColor(0)
 
-        val speedLimitX: Float = speedLimitKgBitmap.width * .5f - getSpeedLimitKgWidth() * .5f
-        val kilogramX: Float = speedLimitX + speedLimitKgPaint.measureText(speedLimitText) + speedLimitKgInterval
-        val h = speedLimitKgBitmap.height * .5f + getSpeedLimitKgHeight() * .5f
-        speedLimitKgCanvas?.drawText(speedLimitText, speedLimitX, h, speedLimitKgPaint)
-        speedLimitKgCanvas?.drawText(kilogramText, kilogramX, h, speedLimitKgPaint)
+        var speedLimitX: Float = speedLimitKgBitmap.width * .5f - getSpeedLimitKgWidth() * .5f
+        var speedLimitY: Float = speedLimitKgBitmap.height * .5f + speedLimitKgInterval
+        speedLimitKgCanvas?.drawText(speedLimitText, speedLimitX, speedLimitY, speedLimitKgPaint)
+        speedLimitX = speedLimitKgBitmap.width * .5f - kilogramTextPaint.measureText(kilogramText) * .5f
+        speedLimitY += (getSpeedLimitKgHeight() * .5f) + speedLimitKgInterval
+        speedLimitKgCanvas?.drawText(kilogramText, speedLimitX, speedLimitY, kilogramTextPaint)
     }
 
     /**
      * @return the width of speedLimit & Kg text at runtime.
      */
     private fun getSpeedLimitKgWidth(): Float =
-            speedLimitKgPaint.measureText(getSpeedText().toString()) + speedLimitKgPaint.measureText(kilogramText) + speedLimitKgInterval
-
+            speedLimitKgPaint.measureText(getSpeedLimitText().toString())
     /**
      * @return the height of speedLimit & Kg text at runtime.
      */
-    private fun getSpeedLimitKgHeight(): Float = speedLimitKgPaint.textSize
+    private fun getSpeedLimitKgHeight(): Float = speedLimitKgPaint.descent() - speedLimitKgPaint.ascent()
 
 
     private fun getTitleTextBounds(): RectF {
@@ -332,7 +365,7 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
     private fun getTitleTextWidth(): Float =
             titleTextPaint.measureText(titleText)
 
-    private fun getTitleTextHeight(): Float = titleTextPaint.textSize
+    private fun getTitleTextHeight(): Float = titleTextPaint.descent() - titleTextPaint.ascent()
 
     private fun updateTitleBitmap(titleText: String) {
         titleTextBitmap.eraseColor(0)
@@ -352,13 +385,11 @@ open class RaySpeedometer @JvmOverloads constructor(context: Context, attrs: Att
     }
 
     fun setSpeedLimits(minSpeed: Float, speedLimit: Float, maxSpeed: Float) {
-        require(minSpeed < speedLimit) { "minSpeed must be smaller than speedLimit !!" }
-        require(speedLimit < maxSpeed) { "speedLimit must be smaller than maxSpeed !!" }
+        require(minSpeed <= speedLimit) { "minSpeed must be smaller than speedLimit !!" }
+        require(speedLimit <= maxSpeed) { "speedLimit must be smaller than maxSpeed !!" }
         cancelSpeedAnimator()
         _speedLimit = speedLimit
-        invalidateGauge()
-        if (isAttachedToWindow)
-            setSpeedAt(speed)
+        setMinMaxSpeed(minSpeed, maxSpeed)
     }
 
     /**

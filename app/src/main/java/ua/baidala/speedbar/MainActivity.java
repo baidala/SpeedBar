@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
         RaySpeedometer speedometer = findViewById(R.id.raySpeedometer);
         speedometer.setTitleText("Ingredient");
+
         speedometer.clearSections();
         Section myNewSection1 = new Section(0f, .9f, Color.GREEN, speedometer.getWidth(), Section.Style.SQUARE);
         Section myNewSection2 = new Section(.9f, 1f, overLimitColor, speedometer.getWidth(), Section.Style.SQUARE);

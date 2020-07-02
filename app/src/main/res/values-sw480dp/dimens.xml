@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="default_button_padding">32dp</dimen>
+
+    <dimen name="edit_weight">288dp</dimen>
+    <dimen name="btn_plus_minus">68dp</dimen>
+    <dimen name="label_material_button_textsize">22sp</dimen>
+
+</resources>

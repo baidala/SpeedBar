@@ -131,8 +131,16 @@
         <attr name="sv_degreeBetweenMark" format="integer"/>
         <attr name="sv_markWidth" format="dimension"/>
         <attr name="sv_rimColor" format="color"/>
+        <attr name="sv_drawSpeedLimit" format="boolean" />
         <attr name="sv_speedLimit" format="float" />
+        <attr name="sv_speedLimitSize" format="dimension" />
+        <attr name="sv_speedLimitColor" format="color" />
         <attr name="sv_titleText" format="string" />
+        <attr name="sv_titleTextSize" format="dimension" />
+        <attr name="sv_titleTextColor" format="color" />
+        <attr name="sv_kilogramText" format="string" />
+        <attr name="sv_kilogramTextSize" format="dimension" />
+        <attr name="sv_kilogramTextColor" format="color" />
     </declare-styleable>
 
     <declare-styleable name="PointerSpeedometer" parent="Speedometer">

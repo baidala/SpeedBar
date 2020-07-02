@@ -487,7 +487,7 @@ abstract class Gauge constructor(context: Context, attrs: AttributeSet? = null, 
     protected fun getSpeedUnitTextBounds(): RectF {
         val left = widthPa * speedTextPosition.x - translatedDx + padding -
                 getSpeedUnitTextWidth() * speedTextPosition.width + speedTextPadding * speedTextPosition.paddingH
-        val top = heightPa * speedTextPosition.y - translatedDy + padding -
+        val top = heightPa * speedTextPosition.y - translatedDy - padding -
                 getSpeedUnitTextHeight() * speedTextPosition.height + speedTextPadding * speedTextPosition.paddingV
         return RectF(left, top, left + getSpeedUnitTextWidth(), top + getSpeedUnitTextHeight())
     }
@@ -499,7 +499,7 @@ abstract class Gauge constructor(context: Context, attrs: AttributeSet? = null, 
         if (unitUnderSpeedText)
             max(speedTextPaint.measureText(getSpeedText().toString()), unitTextPaint.measureText(unit))
         else
-            speedTextPaint.measureText(getSpeedText().toString()) + unitTextPaint.measureText(unit) + unitSpeedInterval
+            speedTextPaint.measureText(getSpeedText().toString()) /*+ unitTextPaint.measureText(unit) + unitSpeedInterval*/
 
     /**
      * @return the height of speed & unit text at runtime.
@@ -674,8 +674,9 @@ abstract class Gauge constructor(context: Context, attrs: AttributeSet? = null, 
     protected fun drawSpeedUnitText(canvas: Canvas) {
         val r = getSpeedUnitTextBounds()
         updateSpeedUnitTextBitmap(getSpeedText().toString())
-        canvas.drawBitmap(speedUnitTextBitmap, r.left - speedUnitTextBitmap.width * .5f + r.width() * .5f
-                , r.top - speedUnitTextBitmap.height * .5f + r.height() * .5f, speedUnitTextBitmapPaint)
+        val left = r.left + r.width() * .5f  - speedUnitTextBitmap.width * .5f
+        val top = r.top + r.height() * .5f - speedUnitTextBitmap.height * .5f
+        canvas.drawBitmap(speedUnitTextBitmap, left, top, speedUnitTextBitmapPaint)
     }
 
     /**
@@ -1002,7 +1003,7 @@ abstract class Gauge constructor(context: Context, attrs: AttributeSet? = null, 
      * @throws IllegalArgumentException if `minSpeed >= maxSpeed`
      */
     fun setMinMaxSpeed(minSpeed: Float, maxSpeed: Float) {
-        require(minSpeed < maxSpeed) { "minSpeed must be smaller than maxSpeed !!" }
+        require(minSpeed <= maxSpeed) { "minSpeed must be smaller than maxSpeed !!" }
         cancelSpeedAnimator()
         _minSpeed = minSpeed
         _maxSpeed = maxSpeed
@@ -1124,12 +1125,12 @@ abstract class Gauge constructor(context: Context, attrs: AttributeSet? = null, 
         TOP_CENTER        (.5f, 0f, .5f, 0f, 0, 1),
         TOP_RIGHT         (1f, 0f, 1f, 0f, -1, 1),
         LEFT              (0f, .5f, 0f, .5f, 1, 0),
-        CENTER            (.5f, .5f, .5f, .5f, 0, 0),
+        CENTER            (.5f, .5f, .5f, .5f, 0, -1),
         RIGHT             (1f, .5f, 1f, .5f, -1, 0),
         BOTTOM_LEFT       (0f, 1f, 0f, 1f, 1, -1),
         BOTTOM_CENTER     (.5f, 1f, .5f, 1f, 0, -1),
         BOTTOM_RIGHT      (1f, 1f, 1f, 1f, -1, -1),
-        BOTTOM_HALF_CENTER(.5f, .75f, .5f, 1f, 0, -1),
-        TOP_HALF_CENTER   (.5f, .25f, .5f, 0f, 0, 1)
+        BOTTOM_HALF_CENTER(.5f, .75f, .5f, .5f, 0, -1),
+        TOP_HALF_CENTER   (.5f, .20f, .5f, .5f, 0, 1)
     }
 }

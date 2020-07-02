@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From AOSP -->
+    <dimen name="selected_calendar_layout_height">230dp</dimen>
+    <dimen name="selected_date_year_size">30dp</dimen>
+    <dimen name="selected_date_day_size">100dp</dimen>
+    <dimen name="selected_date_month_size">30dp</dimen>
+
+    <dimen name="default_button_padding">8dp</dimen>
+
+    <dimen name="edit_weight">108dp</dimen>
+    <dimen name="btn_plus_minus">48dp</dimen>
+    <dimen name="label_material_button_textsize">14sp</dimen>
+</resources>
