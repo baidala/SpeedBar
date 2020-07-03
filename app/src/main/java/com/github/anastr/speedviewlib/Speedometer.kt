@@ -83,8 +83,8 @@ abstract class Speedometer @JvmOverloads constructor(context: Context, attrs: At
             invalidateGauge()
     }
 
-    private var startDegree = 115
-    private var endDegree = 115 + 310
+    private var startDegree = 125
+    private var endDegree = 125 + 290
 
     /**
      * to rotate indicator
@@ -382,6 +382,17 @@ abstract class Speedometer @JvmOverloads constructor(context: Context, attrs: At
             "EndDegree must be smaller than ${speedometerMode.maxDegree} in $speedometerMode Mode !" }
     }
 
+    /*private fun checkReverseStartAndEndDegree() {
+        require(startDegree >= 0) { "StartDegree can\'t be Negative" }
+        require(endDegree >= 0) { "EndDegree can\'t be Negative" }
+        require(startDegree > endDegree) { "StartDegree must be bigger than EndDegree !" }
+        require(startDegree - endDegree <= 360) { "(StartDegree - EndDegree) must be smaller than 360 !" }
+        require(startDegree <= speedometerMode.maxDegree) {
+            "StartDegree must be smaller than ${speedometerMode.maxDegree} in $speedometerMode Mode !" }
+        require(endDegree >= speedometerMode.minDegree) {
+            "EndDegree must be bigger than ${speedometerMode.minDegree} in $speedometerMode Mode !" }
+    }*/
+
     /**
      * add default values for Speedometer inside this method,
      * call super setting method to set default value,
@@ -393,6 +404,8 @@ abstract class Speedometer @JvmOverloads constructor(context: Context, attrs: At
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        /*if (startDegree > endDegree) { degree = getReverseDegreeAtSpeed(currentSpeed) }
+        else { degree = getDegreeAtSpeed(currentSpeed) }*/
         degree = getDegreeAtSpeed(currentSpeed)
     }
 
@@ -480,6 +493,10 @@ abstract class Speedometer @JvmOverloads constructor(context: Context, attrs: At
         return (speed - minSpeed) * (endDegree - startDegree) / (maxSpeed - minSpeed) + startDegree
     }
 
+    /*protected fun getReverseDegreeAtSpeed(speed: Float): Float {
+        return (speed - minSpeed) * (startDegree - endDegree) / (maxSpeed - minSpeed) + endDegree
+    }*/
+
     /**
      * @param degree to know the speed at it.
      * @return current speed at that degree.
@@ -543,6 +560,18 @@ abstract class Speedometer @JvmOverloads constructor(context: Context, attrs: At
             tremble()
         }
     }
+
+    /*fun setReverseStartEndDegree(startDegree: Int, endDegree: Int) {
+        this.startDegree = startDegree
+        this.endDegree = endDegree
+        checkReverseStartAndEndDegree()
+        cancelSpeedAnimator()
+        degree = getDegreeAtSpeed(speed)
+        if (isAttachedToWindow){
+            invalidateGauge()
+            tremble()
+        }
+    }*/
 
     /**
      * Display new [Note](https://github.com/anastr/SpeedView/wiki/Notes)

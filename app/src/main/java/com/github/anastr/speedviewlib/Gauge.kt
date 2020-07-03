@@ -764,7 +764,7 @@ abstract class Gauge constructor(context: Context, attrs: AttributeSet? = null, 
      */
     fun setSpeedAt(speed: Float) {
         var newSpeed = speed
-        newSpeed = if (newSpeed > maxSpeed) maxSpeed else if (newSpeed < minSpeed) minSpeed else newSpeed
+        /*newSpeed = if (newSpeed > maxSpeed) maxSpeed else if (newSpeed < minSpeed) minSpeed else newSpeed*/
         isSpeedIncrease = newSpeed > currentSpeed
         this.speed = newSpeed
         this.currentSpeed = newSpeed
@@ -807,7 +807,7 @@ abstract class Gauge constructor(context: Context, attrs: AttributeSet? = null, 
     @JvmOverloads
     fun speedTo(speed: Float, moveDuration: Long = 2000) {
         var newSpeed = speed
-        newSpeed = if (newSpeed > maxSpeed) maxSpeed else if (newSpeed < minSpeed) minSpeed else newSpeed
+        /*newSpeed = if (newSpeed > maxSpeed) maxSpeed else if (newSpeed < minSpeed) minSpeed else newSpeed*/
         if (newSpeed == this.speed)
             return
         this.speed = newSpeed

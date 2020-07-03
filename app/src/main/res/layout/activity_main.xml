@@ -7,18 +7,17 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.github.anastr.speedviewlib.RaySpeedometer
+    <com.github.anastr.speedviewlib.DistributionSpeedometer
         android:id="@+id/raySpeedometer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="500dp"
+        android:layout_height="500dp"
         RaySpeedometer:sv_backgroundCircleColor="@color/transparent"
         RaySpeedometer:sv_withEffects="false"
         RaySpeedometer:sv_markColor="@color/gray"
         RaySpeedometer:sv_rimColor="@color/text_color_login_label"
-        RaySpeedometer:sv_maxSpeed="11310"
-        RaySpeedometer:sv_speedLimit="11250"
+        RaySpeedometer:sv_degreeBetweenMark="3"
         RaySpeedometer:sv_titleText="Ingredient"
-        RaySpeedometer:sv_titleTextSize="@dimen/progress_bar_large_text_size"
+        RaySpeedometer:sv_titleTextSize="@dimen/progress_bar_normal_text_size"
         RaySpeedometer:sv_speedTextPosition="CENTER"
         RaySpeedometer:sv_speedTextSize="@dimen/progress_bar_large_text_size"
         RaySpeedometer:sv_withTremble="false"
